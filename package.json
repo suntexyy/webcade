@@ -1,0 +1,24 @@
+{
+  "name": "webcade",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.15.0",
+      "onFail": "download"
+    }
+  },
+  "devDependencies": {
+    "turbo": "^2.11.10",
+    "typescript": "^7.0.2"
+  }
+}
