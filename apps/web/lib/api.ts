@@ -31,10 +31,20 @@ async function get<T>(path: string): Promise<T | null> {
   }
 }
 
-export async function getGames(): Promise<Game[]> {
-  return (await get<Game[]>("/games")) ?? [];
+export async function getGames(
+  params: { category?: string; q?: string } = {},
+): Promise<Game[]> {
+  const qs = new URLSearchParams();
+  if (params.category) qs.set("category", params.category);
+  if (params.q) qs.set("q", params.q);
+  const query = qs.toString();
+  return (await get<Game[]>(`/games${query ? `?${query}` : ""}`)) ?? [];
 }
 
 export async function getGame(slug: string): Promise<Game | null> {
   return get<Game>(`/games/${slug}`);
+}
+
+export async function getCategories(): Promise<Category[]> {
+  return (await get<Category[]>("/categories")) ?? [];
 }
