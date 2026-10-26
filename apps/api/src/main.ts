@@ -1,11 +1,8 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
-  if (!process.env.VERCEL) {
-    await import('dotenv/config');
-  }
-
   const app = await NestFactory.create(AppModule);
   app.use((req: { url: string }, _res: unknown, next: () => void) => {
     if (req.url === '/api' || req.url.startsWith('/api/'))

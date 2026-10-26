@@ -3,10 +3,7 @@
   "services": {
     "api": {
       "root": "apps/api",
-      "framework": "nestjs",
-      "functions": {
-        "src/main.ts": { "includeFiles": "package.json" }
-      }
+      "framework": "nestjs"
     },
     "web": {
       "root": "apps/web",
