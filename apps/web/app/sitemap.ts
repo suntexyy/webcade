@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getCategories, getGames } from "@/lib/api";
+import { getCategories, getGames } from "@/features/lib/api";
 
 export const dynamic = "force-dynamic";
 

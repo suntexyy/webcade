@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getGames } from "@/lib/api";
+import { getGames } from "@/features/lib/api";
 
 export default async function Home() {
   const games = await getGames();

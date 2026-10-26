@@ -23,6 +23,13 @@ export class GamesService {
     return this.prisma.category.findMany({ orderBy: { name: 'asc' } });
   }
 
+  async play(slug: string) {
+    await this.prisma.game.updateMany({
+      where: { slug, published: true },
+      data: { plays: { increment: 1 } },
+    });
+  }
+
   bySlug(slug: string) {
     return this.prisma.game.findUnique({
       where: { slug },
