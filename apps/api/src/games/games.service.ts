@@ -5,11 +5,28 @@ import { PrismaService } from '../prisma/prisma.service.js';
 export class GamesService {
   constructor(private prisma: PrismaService) {}
 
-  list() {
+  list(filters: { category?: string; q?: string } = {}) {
     return this.prisma.game.findMany({
-      where: { published: true },
+      where: {
+        published: true,
+        ...(filters.category && { category: { slug: filters.category } }),
+        ...(filters.q && {
+          title: { contains: filters.q, mode: 'insensitive' },
+        }),
+      },
       orderBy: { createdAt: 'desc' },
       include: { category: true },
+    });
+  }
+
+  categories() {
+    return this.prisma.category.findMany({ orderBy: { name: 'asc' } });
+  }
+
+  async play(slug: string) {
+    await this.prisma.game.updateMany({
+      where: { slug, published: true },
+      data: { plays: { increment: 1 } },
     });
   }
 

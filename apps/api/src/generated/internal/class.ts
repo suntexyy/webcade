@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.10.1",
   "engineVersion": "d1b3f377ca835d73fd50954a5e22128b9ebdd6b8",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Category {\n  id    Int    @id @default(autoincrement())\n  name  String\n  slug  String @unique\n  games Game[]\n}\n\nmodel Game {\n  id          Int       @id @default(autoincrement())\n  title       String\n  slug        String    @unique\n  description String\n  thumbnail   String\n  embedUrl    String\n  width       Int       @default(800)\n  height      Int       @default(600)\n  plays       Int       @default(0)\n  published   Boolean   @default(false)\n  createdAt   DateTime  @default(now())\n  category    Category? @relation(fields: [categoryId], references: [id])\n  categoryId  Int?\n}\n",
+  "inlineSchema": "generator client {\n  provider     = \"prisma-client\"\n  output       = \"../src/generated\"\n  moduleFormat = \"cjs\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Category {\n  id    Int    @id @default(autoincrement())\n  name  String\n  slug  String @unique\n  games Game[]\n}\n\nmodel Game {\n  id          Int       @id @default(autoincrement())\n  title       String\n  slug        String    @unique\n  description String\n  thumbnail   String\n  embedUrl    String\n  width       Int       @default(800)\n  height      Int       @default(600)\n  plays       Int       @default(0)\n  published   Boolean   @default(false)\n  createdAt   DateTime  @default(now())\n  category    Category? @relation(fields: [categoryId], references: [id])\n  categoryId  Int?\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -45,10 +45,10 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.js"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.js")
     return await decodeBase64AsWasm(wasm)
   },
 
