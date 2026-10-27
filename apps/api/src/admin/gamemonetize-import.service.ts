@@ -114,6 +114,10 @@ export class GameMonetizeImportService {
     let created = 0;
     let skipped = 0;
 
+    let skippedExisting = 0;
+    let skippedInvalid = 0;
+    let skippedEmptyTitle = 0;
+
     for (const raw of items) {
       const parsed = feedItem.safeParse(raw);
       if (
@@ -129,9 +133,23 @@ export class GameMonetizeImportService {
       const exists = await this.prisma.game.findFirst({
         where: { embedUrl: g.url },
       });
+
       const title = cleanText(g.title, 120);
-      if (exists || !title) {
-        skipped++;
+
+      if (exists) {
+        console.log('Already exists:', {
+          incomingTitle: g.title,
+          incomingUrl: g.url,
+          existingTitle: exists.title,
+          existingId: exists.id,
+        });
+
+        skippedExisting++;
+        continue;
+      }
+
+      if (!title) {
+        skippedEmptyTitle++;
         continue;
       }
 
@@ -161,7 +179,13 @@ export class GameMonetizeImportService {
       });
       created++;
     }
-
-    return { fetched: items.length, created, skipped };
+    return {
+      fetched: items.length,
+      created,
+      skipped,
+      skippedExisting,
+      skippedInvalid,
+      skippedEmptyTitle,
+    };
   }
 }
