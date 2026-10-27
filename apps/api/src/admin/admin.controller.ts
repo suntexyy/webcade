@@ -103,4 +103,15 @@ export class AdminController {
     const d = parse(z.object({ feedUrl: z.string().url() }), body);
     return this.gameMonetizeImportService.importFromFeed(d.feedUrl);
   }
+  @Patch('games/publish-all')
+  async publishAllGames() {
+    const result = await this.prisma.game.updateMany({
+      where: { published: false },
+      data: { published: true },
+    });
+
+    return {
+      published: result.count,
+    };
+  }
 }
