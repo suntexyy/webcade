@@ -13,6 +13,7 @@ import {
 import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { AdminGuard } from './admin.guard.js';
+import { GameMonetizeImportService } from './gamemonetize-import.service.js';
 
 const slugify = (s: string) =>
   s
@@ -47,7 +48,10 @@ function parse<T extends z.ZodTypeAny>(schema: T, body: unknown): z.infer<T> {
 @Controller('admin')
 @UseGuards(AdminGuard)
 export class AdminController {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private gameMonetizeImportService: GameMonetizeImportService,
+  ) {}
 
   @Get('games')
   games() {
@@ -93,5 +97,10 @@ export class AdminController {
     return this.prisma.category.create({
       data: { name: d.name, slug: slugify(d.name) },
     });
+  }
+  @Post('import/gamemonetize')
+  importGameMonetize(@Body() body: unknown) {
+    const d = parse(z.object({ feedUrl: z.string().url() }), body);
+    return this.gameMonetizeImportService.importFromFeed(d.feedUrl);
   }
 }
