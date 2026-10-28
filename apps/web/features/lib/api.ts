@@ -1,4 +1,4 @@
-export type Category = { id: number; name: string; slug: string };
+export type Category = { id: number; name: string; slug: string; items: [] };
 
 export type Game = {
   id: number;
@@ -13,38 +13,45 @@ export type Game = {
   category: Category | null;
 };
 
-const BASE = process.env.API_URL ?? "http://localhost:4000";
+export type GameCard = Pick<
+  Game,
+  "id" | "slug" | "title" | "thumbnail" | "category"
+>;
 
-function url(path: string) {
-  const base = BASE.endsWith("/") ? BASE : `${BASE}/`;
-  return new URL(path.replace(/^\//, ""), base);
-}
+export type Paginated<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
 
-async function get<T>(path: string): Promise<T | null> {
-  try {
-    const res = await fetch(url(path), { cache: "no-store" });
-    if (!res.ok) return null;
-    const text = await res.text();
-    return text ? (JSON.parse(text) as T) : null;
-  } catch {
-    return null;
-  }
-}
+type Params = Record<string, string | number | undefined>;
 
-export async function getGames(
-  params: { category?: string; q?: string } = {},
-): Promise<Game[]> {
+// Server: calls the NestJS API directly. Browser: goes through our own /api proxy.
+export async function apiFetch<T>(
+  path: string,
+  params: Params = {},
+): Promise<T | null> {
+  const isServer = typeof window === "undefined";
+  const clean = path.replace(/^\//, "");
+
   const qs = new URLSearchParams();
-  if (params.category) qs.set("category", params.category);
-  if (params.q) qs.set("q", params.q);
+  for (const [k, v] of Object.entries(params))
+    if (v !== undefined && v !== "") qs.set(k, String(v));
   const query = qs.toString();
-  return (await get<Game[]>(`/games${query ? `?${query}` : ""}`)) ?? [];
-}
 
-export async function getGame(slug: string): Promise<Game | null> {
-  return get<Game>(`/games/${slug}`);
-}
+  const base = isServer
+    ? (process.env.API_URL ?? "http://localhost:4000").replace(/\/$/, "")
+    : "/api";
+  const res = await fetch(
+    `${base}/${clean}${query ? `?${query}` : ""}`,
+    isServer ? { cache: "no-store" } : undefined,
+  );
 
-export async function getCategories(): Promise<Category[]> {
-  return (await get<Category[]>("/categories")) ?? [];
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Request failed (${res.status})`);
+
+  const text = await res.text(); // NestJS answers with an empty body when a game does not exist
+  return text ? (JSON.parse(text) as T) : null;
 }

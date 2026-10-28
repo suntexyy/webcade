@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 export default function PlayTracker({ slug }: { slug: string }) {
+  const { mutate } = useMutation({
+    mutationFn: async () => {
+      await fetch(`/track/${slug}`, { method: "POST" });
+    },
+  });
+
   useEffect(() => {
     try {
       const key = `played:${slug}`;
@@ -11,8 +18,8 @@ export default function PlayTracker({ slug }: { slug: string }) {
     } catch {
       // storage unavailable, count anyway
     }
-    fetch(`/track/${slug}`, { method: "POST" }).catch(() => {});
-  }, [slug]);
+    mutate();
+  }, [slug, mutate]);
 
   return null;
 }

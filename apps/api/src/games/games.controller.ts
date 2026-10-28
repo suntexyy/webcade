@@ -6,8 +6,23 @@ export class GamesController {
   constructor(private games: GamesService) {}
 
   @Get()
-  list(@Query('category') category?: string, @Query('q') q?: string) {
-    return this.games.list({ category, q });
+  list(
+    @Query('category') category?: string,
+    @Query('q') q?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.games.list({
+      category,
+      q: q?.trim().slice(0, 100) || undefined,
+      page: Number(page) || 1,
+      limit: Number(limit) || 30,
+    });
+  }
+
+  @Get('slugs')
+  slugs() {
+    return this.games.slugs();
   }
 
   @Get(':slug')

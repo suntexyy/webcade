@@ -15,6 +15,14 @@ export type AdminGame = {
   categoryId: number | null;
 };
 
+export type AdminGamesPage = {
+  items: AdminGame[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
 const BASE = process.env.API_URL ?? "http://localhost:4000";
 
 export function adminFetch(path: string, init: RequestInit = {}) {

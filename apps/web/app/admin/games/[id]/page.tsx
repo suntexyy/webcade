@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/features/lib/auth";
-import { getCategories } from "@/features/lib/api";
 import { adminFetch, type AdminGame } from "@/features/lib/admin-api";
+import { getQueryClient } from "@/features/lib/get-query-client";
+import { categoriesQuery } from "@/features/lib/queries";
 import GameForm from "@/features/components/GameForm";
 import { updateGame } from "../../game-actions";
 
@@ -14,12 +15,15 @@ export default async function EditGamePage({ params }: Props) {
   await requireAdmin();
   const { id } = await params;
 
-  const res = await adminFetch("/admin/games");
-  const games: AdminGame[] = res.ok ? await res.json() : [];
-  const game = games.find((g) => g.id === Number(id));
+  const numericId = Number(id);
+  if (!Number.isInteger(numericId)) notFound();
+
+  const res = await adminFetch(`/admin/games/${numericId}`);
+  const text = res.ok ? await res.text() : "";
+  const game: AdminGame | null = text ? JSON.parse(text) : null;
   if (!game) notFound();
 
-  const categories = await getCategories();
+  const categories = await getQueryClient().fetchQuery(categoriesQuery());
 
   return (
     <main className="mx-auto max-w-2xl p-6">

@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { z } from 'zod';
@@ -54,9 +55,48 @@ export class AdminController {
   ) {}
 
   @Get('games')
-  games() {
-    return this.prisma.game.findMany({
-      orderBy: { createdAt: 'desc' },
+  async games(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('q') q?: string,
+    @Query('status') status?: string,
+  ) {
+    const take = Math.min(Math.max(Number(limit) || 30, 1), 100);
+    const current = Math.max(Number(page) || 1, 1);
+    const search = q?.trim().slice(0, 100);
+
+    const where = {
+      ...(search && {
+        title: { contains: search, mode: 'insensitive' as const },
+      }),
+      ...(status === 'published' && { published: true }),
+      ...(status === 'draft' && { published: false }),
+    };
+
+    const [total, items] = await Promise.all([
+      this.prisma.game.count({ where }),
+      this.prisma.game.findMany({
+        where,
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        skip: (current - 1) * take,
+        take,
+        include: { category: true },
+      }),
+    ]);
+
+    return {
+      items,
+      total,
+      page: current,
+      pageSize: take,
+      totalPages: Math.max(Math.ceil(total / take), 1),
+    };
+  }
+
+  @Get('games/:id')
+  game(@Param('id', ParseIntPipe) id: number) {
+    return this.prisma.game.findUnique({
+      where: { id },
       include: { category: true },
     });
   }
