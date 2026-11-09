@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import QueryProvider from "@/features/components/QueryProvider";
-import Header from "@/features/components/ImportForm";
-import Footer from "@/features/components/LoginForm";
+import Header from "@/features/components/Header";
+import Footer from "@/features/components/Footer";
 import { getQueryClient } from "@/features/lib/get-query-client";
 import { categoriesQuery } from "@/features/lib/queries";
 

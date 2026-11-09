@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { requireAdmin } from "@/features/lib/auth";
-import ImportForm from "@/features/components/SearchBox";
+import ImportForm from "@/features/components/ImportForm";
 
 export const metadata = { title: "Import games", robots: { index: false } };
 

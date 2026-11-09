@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Gamepad2 } from "lucide-react";
-import SearchBox from "./Footer";
+import SearchBox from "./SearchBox";
 import { categoriesQuery } from "../lib/queries";
 
 export default function Header() {
