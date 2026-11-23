@@ -26,19 +26,16 @@ export const gamesQuery = ({ category, q, page, limit }: GamesParams = {}) =>
         limit: limit ?? 30,
       },
     ] as const,
-    queryFn: async () =>
-      (await apiFetch<Paginated<GameCard>>("games", {
+    queryFn: async () => {
+      const data = await apiFetch<Paginated<GameCard>>("games", {
         category,
         q,
         page: page && page > 1 ? page : undefined,
         limit: limit && limit !== 30 ? limit : undefined,
-      })) ?? {
-        items: [],
-        total: 0,
-        page: page ?? 1,
-        pageSize: limit ?? 30,
-        totalPages: 1,
-      },
+      });
+      if (!data) throw new Error("The games request returned no data");
+      return data;
+    },
   });
 
 export const gameQuery = (slug: string) =>

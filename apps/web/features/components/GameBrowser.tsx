@@ -26,18 +26,19 @@ export default function GameBrowser({
 
   const enabled = !requireQuery || !!q;
 
-  const { data, isPending, isError, isPlaceholderData, refetch } = useQuery({
-    ...gamesQuery({ category, q, page }),
-    placeholderData: keepPreviousData,
-    enabled,
-  });
+  const { data, error, isPending, isError, isPlaceholderData, refetch } =
+    useQuery({
+      ...gamesQuery({ category, q, page }),
+      placeholderData: keepPreviousData,
+      enabled,
+    });
 
-  // warm the cache with the next page so clicking "Next" feels instant
+  // warm the cache with the next page, but only once the current page is real data
   useEffect(() => {
-    if (enabled && data && page < data.totalPages) {
+    if (enabled && data && !isPlaceholderData && page < data.totalPages) {
       queryClient.prefetchQuery(gamesQuery({ category, q, page: page + 1 }));
     }
-  }, [data, page, q, category, enabled, queryClient]);
+  }, [data, isPlaceholderData, page, q, category, enabled, queryClient]);
 
   if (!enabled)
     return (
