@@ -21,9 +21,16 @@ import {
 } from "@/features/lib/admin-api";
 import { pageHref } from "@/features/lib/pagination";
 import { logout } from "./actions";
-import { addCategory, deleteGame, togglePublished } from "./game-actions";
+import {
+  addCategory,
+  deleteGame,
+  deleteCategory,
+  togglePublished,
+} from "./game-actions";
 import DeleteButton from "@/features/components/DeleteButton";
 import AdminPagination from "@/features/components/AdminPagination";
+import { getQueryClient } from "@/features/lib/get-query-client";
+import { categoriesQuery } from "@/features/lib/queries";
 
 export const metadata = { title: "Admin", robots: { index: false } };
 
@@ -56,6 +63,7 @@ export default async function AdminPage({ searchParams }: Props) {
   const data: AdminGamesPage | null = res.ok ? await res.json() : null;
   const error = res.ok ? null : await apiError(res);
   const games = data?.items ?? [];
+  const categories = await getQueryClient().fetchQuery(categoriesQuery());
 
   // a page that no longer exists, for example after deleting the last game on it
   if (data && games.length === 0 && page > 1) {
@@ -68,7 +76,6 @@ export default async function AdminPage({ searchParams }: Props) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 -top-16 -z-10 h-64 bg-[radial-gradient(ellipse_at_top,rgb(99_102_241/0.14),transparent_65%)]"
       />
-
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <h1 className="bg-gradient-to-b from-zinc-900 to-zinc-600 bg-clip-text pb-1 text-3xl font-bold tracking-tight text-transparent dark:from-white dark:to-zinc-400">
           Admin
@@ -90,7 +97,6 @@ export default async function AdminPage({ searchParams }: Props) {
           </form>
         </div>
       </div>
-
       <form action="/admin" className="mb-5 flex flex-wrap items-center gap-2">
         <div className="relative">
           <Search
@@ -126,7 +132,6 @@ export default async function AdminPage({ searchParams }: Props) {
           </Link>
         )}
       </form>
-
       {error && (
         <p
           role="alert"
@@ -147,7 +152,6 @@ export default async function AdminPage({ searchParams }: Props) {
           games
         </p>
       )}
-
       <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white/70 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.03] dark:shadow-none">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-zinc-200 bg-zinc-50/80 text-xs uppercase tracking-wider text-zinc-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-zinc-400">
@@ -264,7 +268,6 @@ export default async function AdminPage({ searchParams }: Props) {
           </tbody>
         </table>
       </div>
-
       {data && (
         <AdminPagination
           page={data.page}
@@ -273,22 +276,54 @@ export default async function AdminPage({ searchParams }: Props) {
         />
       )}
 
-      <form
-        action={addCategory}
-        className="mt-10 flex max-w-md flex-wrap items-center gap-2 rounded-2xl border border-zinc-200 bg-white/70 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.03] dark:shadow-none"
+      <section
+        aria-labelledby="categories-heading"
+        className="mt-10 max-w-2xl rounded-2xl border border-zinc-200 bg-white/70 p-5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.03] dark:shadow-none"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
-          <FolderPlus aria-hidden="true" className="h-4 w-4" />
-        </span>
-        <input
-          name="name"
-          placeholder="New category name"
-          aria-label="New category name"
-          required
-          className={`${field} min-w-0 flex-1`}
-        />
-        <button className={btnOutline}>Add category</button>
-      </form>
+        <h2
+          id="categories-heading"
+          className="mb-4 text-lg font-semibold tracking-tight text-zinc-900 dark:text-white"
+        >
+          Categories
+        </h2>
+
+        <ul className="mb-5 flex flex-wrap gap-2">
+          {categories.map((c) => (
+            <li
+              key={c.id}
+              className="flex items-center gap-1 rounded-full border border-zinc-200 bg-white py-0.5 pl-3 pr-1 text-sm dark:border-white/10 dark:bg-white/[0.04]"
+            >
+              <span className="text-zinc-700 dark:text-zinc-300">{c.name}</span>
+              <form action={deleteCategory.bind(null, c.id)}>
+                <DeleteButton
+                  iconOnly
+                  label={`Delete category ${c.name}`}
+                  message={`Delete the category "${c.name}"? Its games stay on the site but lose their category.`}
+                />
+              </form>
+            </li>
+          ))}
+          {categories.length === 0 && (
+            <li className="text-sm text-zinc-500 dark:text-zinc-400">
+              No categories yet.
+            </li>
+          )}
+        </ul>
+
+        <form
+          action={addCategory}
+          className="flex flex-wrap items-center gap-2"
+        >
+          <input
+            name="name"
+            placeholder="New category name"
+            aria-label="New category name"
+            required
+            className={`${field} min-w-0 flex-1`}
+          />
+          <button className={btnOutline}>Add category</button>
+        </form>
+      </section>
     </main>
   );
 }

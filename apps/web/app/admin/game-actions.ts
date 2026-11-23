@@ -22,6 +22,12 @@ function payload(fd: FormData) {
   };
 }
 
+export async function deleteCategory(id: number) {
+  await requireAdmin();
+  await adminFetch(`/admin/categories/${id}`, { method: "DELETE" });
+  revalidatePath("/", "layout");
+}
+
 export async function createGame(_prev: string | undefined, fd: FormData) {
   await requireAdmin();
   const res = await adminFetch("/admin/games", {

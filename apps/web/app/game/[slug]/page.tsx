@@ -6,6 +6,7 @@ import PlayTracker from "@/features/components/PlayTracker";
 import RelatedGames from "@/features/components/RelatedGames";
 import { getQueryClient } from "@/features/lib/get-query-client";
 import { gameQuery, gamesQuery } from "@/features/lib/queries";
+import GamePlayer from "@/features/components/GamePlayer";
 
 const SITE = process.env.SITE_URL ?? "http://localhost:3000";
 
@@ -91,24 +92,7 @@ export default async function GamePage({ params }: Props) {
         </h1>
       </header>
 
-      <div
-        role="region"
-        aria-label={`${game.title} game player`}
-        className="mx-auto mb-10 w-full overflow-hidden rounded-2xl bg-black shadow-2xl shadow-indigo-500/15 ring-1 ring-zinc-900/10 dark:shadow-indigo-500/20 dark:ring-white/15"
-        style={{
-          aspectRatio: ratio,
-          maxWidth: `min(100%, calc(80vh * ${ratio}))`,
-        }}
-      >
-        <iframe
-          src={game.embedUrl}
-          title={game.title}
-          className="h-full w-full"
-          allow="autoplay; fullscreen; gamepad"
-          allowFullScreen
-          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-modals allow-pointer-lock allow-top-navigation-by-user-activation"
-        />
-      </div>
+      <GamePlayer embedUrl={game.embedUrl} title={game.title} ratio={ratio} />
 
       <section className="max-w-3xl rounded-2xl border border-zinc-200 bg-white/70 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.03] dark:shadow-none">
         <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">

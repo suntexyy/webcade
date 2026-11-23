@@ -150,6 +150,13 @@ export class AdminController {
       data: { name: d.name, slug: slugify(d.name) },
     });
   }
+
+  @Delete('categories/:id')
+  async deleteCategory(@Param('id', ParseIntPipe) id: number) {
+    const result = await this.prisma.category.deleteMany({ where: { id } });
+    return { deleted: result.count > 0 };
+  }
+
   @Post('import/gamemonetize')
   importGameMonetize(@Body() body: unknown) {
     const d = parse(z.object({ feedUrl: z.string().url() }), body);
