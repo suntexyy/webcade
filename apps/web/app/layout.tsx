@@ -21,6 +21,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Webcade",
   description: "A web-based arcade for playing classic games online.",
+  other: {
+    "strix-verification": "strix-verify-0c48f39f005eac928f99845e7ba250ee",
+  },
 };
 
 export default async function RootLayout({
@@ -33,12 +36,6 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        <meta
-          name="strix-verification"
-          content="strix-verify-0c48f39f005eac928f99845e7ba250ee"
-        ></meta>
-      </head>
       <body>
         <QueryProvider>
           <HydrationBoundary state={dehydrate(queryClient)}>
