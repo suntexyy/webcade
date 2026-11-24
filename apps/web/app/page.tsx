@@ -19,7 +19,7 @@ export default async function Home({ searchParams }: Props) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 -top-24 -z-10 h-80 bg-[radial-gradient(ellipse_at_top,rgb(99_102_241/0.18),transparent_65%)]"
       />
-      <h1 className="mb-2 bg-gradient-to-b from-zinc-900 to-zinc-600 bg-clip-text pb-1 text-4xl font-bold tracking-tight text-transparent sm:text-5xl dark:from-white dark:to-zinc-400">
+      <h1 className="mb-2 bg-linear-to-b from-zinc-900 to-zinc-600 bg-clip-text pb-1 text-4xl font-bold tracking-tight text-transparent sm:text-5xl dark:from-white dark:to-zinc-400">
         Play free games online
       </h1>
       <p className="mb-10 max-w-xl text-zinc-600 dark:text-zinc-400">
